@@ -1,0 +1,6 @@
+[
+    {
+        "name": "Raspberry-Pi-Zero GCC 10",
+        "toolchainFile": "/home/gui/Projects/sdk/cross-pi-gcc-10.1.0-0/toolchain/toolchain.cmake"
+    }
+]
