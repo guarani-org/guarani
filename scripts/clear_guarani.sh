@@ -1,0 +1,1 @@
+ssh pi@192.168.0.28 "sh -c 'cd /home/pi; rm *.gni'"

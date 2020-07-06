@@ -10,10 +10,10 @@
 namespace fs = std::filesystem;
 namespace gni {
 
-    const uint8_t baud_rate_cmd[] = {
-      0xb5, 0x62, 0x06, 0x00, 0x14, 0x00, 0x01, 0x00, 0x00, 0x00, 0xd0,
-      0x08, 0x00, 0x00, 0x00, 0xc2, 0x01, 0x00, 0x07, 0x00, 0x07, 0x00,
-      0x00, 0x00, 0x00, 0x00, 0xc4, 0x96, 0xb5, 0x62, 0x06, 0x00, 0x01};
+const uint8_t baud_rate_cmd[] = {
+    0xb5, 0x62, 0x06, 0x00, 0x14, 0x00, 0x01, 0x00, 0x00, 0x00, 0xd0,
+    0x08, 0x00, 0x00, 0x00, 0xc2, 0x01, 0x00, 0x07, 0x00, 0x07, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0xc4, 0x96, 0xb5, 0x62, 0x06, 0x00, 0x01};
 
 std::vector<uint8_t> ublox_config::hex2byte(std::string_view hex) noexcept {
   std::vector<uint8_t> bytes;
@@ -30,6 +30,7 @@ std::vector<uint8_t> ublox_config::hex2byte(std::string_view hex) noexcept {
 bool ublox_config::configure(serial_t &serial,
                              std::string_view hex_file) noexcept {
 
+  printf("Flashing GPS: %s\n", hex_file.data());
   if (!fs::exists(hex_file)) {
     std::cerr << "Hex file: " << hex_file << " does not exist!\n";
     return false;
@@ -49,14 +50,14 @@ bool ublox_config::configure(serial_t &serial,
     for (auto &byte : bytes) {
       serial.write(&byte, 1);
     }
-    std::cout << "GPS Configuration written: " << line << "\n";
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 
-  serial.write((uint8_t*)baud_rate_cmd,sizeof(baud_rate_cmd));
+  serial.write((uint8_t *)baud_rate_cmd, sizeof(baud_rate_cmd));
+  printf("GPS Baudrate set to 115200\n");
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
+  printf("Gps Flashing complete!\n");
   return true;
-} // namespace gni
+}
 
 } // namespace gni

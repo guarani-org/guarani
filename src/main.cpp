@@ -2,8 +2,7 @@
 #include <config_ublox.h>
 #include <fstream>
 #include <mutex>
-#include <packet.h>
-#include <queue>
+#include <recorder.h>
 #include <serial.h>
 #include <thread>
 
@@ -20,60 +19,46 @@ int main(int ac, char **av) {
   serial.set_baudrate(B115200);
 
   std::mutex pkt_mtx;
-  std::queue<gni::packet_t> packets;
+  gni::packet_queue_t packets;
 
-  auto thread_writter = std::thread([&packets, &pkt_mtx]() {
-    FILE *out;
-    out = fopen("data.gni", "wb");
-    while (1) {
-      if (packets.empty()) {
-        std::this_thread::yield();
-      } else {
-        // std::unique_lock<std::mutex> lock(pkt_mtx);
-        auto packet = std::move(packets.front());
-        packets.pop();
-        fwrite(&packet, sizeof(gni::header_t) + packet.header.size, 1, out);
-      }
-    }
-  });
+  gni::recorder_t rec(packets, 1024 * 10);
+  rec.initialize();
+  rec.start();
 
   auto thread_gps = std::thread([&serial, &packets, &pkt_mtx]() {
-    uint8_t buffer[8192];
+    uint8_t buffer[gni::max_payload_sz];
     uint16_t buff_pos = 0;
     uint8_t temp = 0;
     uint16_t bytes_received = 0;
+    gni::packet_t pkt;
 
     while (1) {
       bytes_received = serial.read(temp, 1);
       if (bytes_received > 0) {
         buffer[buff_pos++] = temp;
-        if (buff_pos >= sizeof(buffer) - 1) {
-          buffer[buff_pos] = '\0';
-          // std::unique_lock<std::mutex> lock(pkt_mtx);
-          packets.emplace(gni::pkt_type::gps, buff_pos, buffer);
-          std::cout << buffer << "\n dataLen = " << buff_pos << "\n";
-          ::memset(&buffer, 0, buff_pos);
+        if (buff_pos >= sizeof(buffer)) {
+          if (gni::create_packet(pkt, gni::pkt_type::gps, buffer,
+                                 buff_pos - 1)) {
+            std::unique_lock<std::mutex> lock(pkt_mtx);
+            packets.push(pkt);
+          }
           buff_pos = 0;
-        } else {
-          std::this_thread::yield();
         }
       } else {
         if (buff_pos > 0) {
-          buffer[buff_pos] = '\0';
-          // std::unique_lock<std::mutex> lock(pkt_mtx);
-          packets.emplace(gni::pkt_type::gps, buff_pos, buffer);
-          std::cout << buffer << "\n dataLen = " << buff_pos << " :timeout\n";
-          ::memset(&buffer, 0, buff_pos);
+          if (gni::create_packet(pkt, gni::pkt_type::gps, buffer,
+                                 buff_pos - 1)) {
+            std::unique_lock<std::mutex> lock(pkt_mtx);
+            packets.push(pkt);
+          }
           buff_pos = 0;
-        } else {
-          std::this_thread::yield();
         }
       }
       std::this_thread::yield();
     }
   });
 
+  rec.join();
   thread_gps.join();
-  thread_writter.join();
   return 0;
 }
