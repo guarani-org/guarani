@@ -20,7 +20,7 @@ set_target_properties(guarani PROPERTIES
                           CXX_STANDARD_REQUIRED YES
                           CXX_EXTENSIONS NO)
 
-target_compile_features(guarani PRIVATE cxx_std_17)
+#target_compile_features(guarani PRIVATE cxx_std_17)
 
 target_link_libraries(guarani PRIVATE Threads::Threads)
 

@@ -28,7 +28,22 @@ struct packet_t {
 
 static constexpr auto packet_header_size = sizeof(header_t);
 inline bool create_packet(packet_t &pkt, uint8_t type, void *payload,
-                   uint32_t size) noexcept {
+                          uint32_t size) noexcept {
+  if (size <= max_payload_sz) {
+    timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    pkt.header.type = type;
+    pkt.header.seconds = ts.tv_sec;
+    pkt.header.nanos = ts.tv_nsec;
+    pkt.header.size = size;
+    memcpy(pkt.payload, payload, size);
+    return true;
+  }
+  return false;
+}
+
+inline bool create_packet(packet_t &pkt, void *payload,
+                          uint32_t size) noexcept {
   if (size <= max_payload_sz) {
     timespec ts;
     clock_gettime(CLOCK_REALTIME, &ts);
