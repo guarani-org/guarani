@@ -7,7 +7,7 @@ namespace gni {
 class gps_t : public thread_t {
 public:
   gps_t(std::string_view serial_port, uint32_t baudrate, uint32_t mode,
-        packet_queue_t &packets);
+        packet_queue_t &packets,std::string_view gps_hex_file);
   ~gps_t(void) = default;
 
   bool set_baudrate(uint32_t baudrate) noexcept;

@@ -65,7 +65,7 @@ int serial_t::write(uint8_t *buffer, uint32_t size) noexcept {
 }
 
 int serial_t::read(uint8_t *buffer, uint32_t bytes2read) noexcept {
-  return ::read(_fd, &buffer, bytes2read);
+  return ::read(_fd, buffer, bytes2read);
 }
 
 } // namespace gni

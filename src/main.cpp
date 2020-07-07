@@ -1,29 +1,37 @@
 
 #include <config_ublox.h>
 #include <fstream>
-#include <mutex>
+#include <gps.h>
 #include <recorder.h>
 #include <serial.h>
 #include <thread>
-#include <gps.h>
 
 int main(int ac, char **av) {
-  gni::serial_t serial("/dev/ttyS0", B9600);
-  if (!serial.open(O_RDWR | O_NOCTTY)) {
+  // gni::serial_t serial("/dev/ttyS0", B9600);
+  // if (!serial.open(O_RDWR | O_NOCTTY)) {
 
-    return -1;
-  }
+  //   return -1;
+  // }
 
-  gni::ublox_config ubcfg;
-  ubcfg.configure(serial, "gps.hex");
+  // gni::ublox_config ubcfg;
+  // ubcfg.configure(serial, "gps.hex");
 
-  serial.set_baudrate(B115200);
+  // serial.set_baudrate(B115200);
 
-  std::mutex pkt_mtx;
+  // std::mutex pkt_mtx;
   gni::packet_queue_t packets;
 
   gni::recorder_t rec(packets, 1024 * 10);
-  rec.initialize();
+  gni::gps_t gps("/dev/ttyS0", B9600, O_RDWR | O_NOCTTY, packets, "gps.hex");
+
+  if(!rec.initialize()){
+    return -1;
+  }
+ 
+  if(!gps.initialize()){
+    return -1;
+  }
+  gps.start();
   rec.start();
 
   // auto thread_gps = std::thread([&serial, &packets, &pkt_mtx]() {
@@ -60,6 +68,6 @@ int main(int ac, char **av) {
   // });
 
   rec.join();
-  //thread_gps.join();
+  // thread_gps.join();
   return 0;
 }

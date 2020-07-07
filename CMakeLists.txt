@@ -11,7 +11,7 @@ find_package(Threads REQUIRED)
 
 
 add_executable(guarani src/main.cpp src/config_ublox.cpp src/serial.cpp
-                        src/recorder.cpp)
+                        src/recorder.cpp src/gps.cpp)
 
 target_include_directories(guarani PRIVATE "include")
 
