@@ -22,7 +22,8 @@ bool serial_t::open(int32_t mode) noexcept {
 
   memset(&_newtio, 0, sizeof(_newtio));
 
-  _newtio.c_cflag = _baud_rate | CRTSCTS | CS8 | CLOCAL | CREAD;
+  //_newtio.c_cflag = _baud_rate | CRTSCTS | CS8 | CLOCAL | CREAD;
+  _newtio.c_cflag = _baud_rate | CS8 | CLOCAL | CREAD;
   _newtio.c_iflag = IGNPAR;
   _newtio.c_oflag = 0;
 
@@ -42,7 +43,8 @@ bool serial_t::open(int32_t mode) noexcept {
 
 bool serial_t::set_baudrate(int baud_rate) noexcept {
   _baud_rate = baud_rate;
-  _newtio.c_cflag = _baud_rate | CRTSCTS | CS8 | CLOCAL | CREAD;
+  //_newtio.c_cflag = _baud_rate | CRTSCTS | CS8 | CLOCAL | CREAD;
+  _newtio.c_cflag = _baud_rate | CS8 | CLOCAL | CREAD;
 
   if (tcflush(_fd, TCIFLUSH) >= 0 && tcsetattr(_fd, TCSANOW, &_newtio) >= 0) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
