@@ -11,7 +11,7 @@ find_package(Threads REQUIRED)
 
 
 add_executable(guarani src/main.cpp src/config_ublox.cpp src/serial.cpp
-                        src/recorder.cpp)
+                        src/recorder.cpp src/gps.cpp)
 
 target_include_directories(guarani PRIVATE "include")
 
@@ -20,7 +20,7 @@ set_target_properties(guarani PROPERTIES
                           CXX_STANDARD_REQUIRED YES
                           CXX_EXTENSIONS NO)
 
-target_compile_features(guarani PRIVATE cxx_std_17)
+#target_compile_features(guarani PRIVATE cxx_std_17)
 
 target_link_libraries(guarani PRIVATE Threads::Threads)
 

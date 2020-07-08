@@ -25,6 +25,7 @@ void recorder_t::run(std::atomic_bool &stop_flag) noexcept {
         _file_size_counter = 0;
         open_new_file();
       }
+      std::this_thread::yield();
     }
   }
 }
@@ -37,7 +38,7 @@ bool recorder_t::open_new_file(void) noexcept {
   _file = fopen(os.str().data(), "wb+");
   if (_file != nullptr && _file != NULL) {
     setbuf(_file, NULL); // no buffering
-    printf("New file created: %s\n",os.str().data());
+    printf("New file created: %s\n", os.str().data());
     return true;
   }
   return false;

@@ -22,7 +22,7 @@ public:
   bool open(int32_t mode) noexcept;
   bool close(void) noexcept;
   int write(uint8_t *buffer, uint32_t size) noexcept;
-  int read(uint8_t &buffer, uint32_t bytes2read) noexcept;
+  int read(uint8_t *buffer, uint32_t bytes2read) noexcept;
   bool set_baudrate(int baudrate) noexcept;
 
 private:
