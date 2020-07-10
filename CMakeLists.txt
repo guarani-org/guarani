@@ -8,15 +8,15 @@ enable_testing()
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-add_library(bmp3 STATIC BMP3-Sensor-API/bmp3.c BMP3-Sensor-API/self-test/bmp3_selftest.c)
-target_include_directories(bmp3 PRIVATE "BMP3-Sensor-API" "BMP3-Sensor-API/self-test")
+add_library(bmp280 STATIC BMP280_driver/bmp280.c)
+target_include_directories(bmp280 PRIVATE "BMP280_driver")
 
 add_library(lsm9ds1 STATIC STMems_Standard_C_drivers/lsm9ds1_STdC/driver/lsm9ds1_reg.c)
 
 add_executable(guarani src/main.cpp src/config_ublox.cpp src/serial.cpp
-                        src/recorder.cpp src/gps.cpp)
+                        src/recorder.cpp src/gps.cpp src/i2c.cpp)
 
-target_include_directories(guarani PRIVATE "include" "STMems_Standard_C_drivers/lsm9ds1_STdC/driver" "BMP3-Sensor-API")
+target_include_directories(guarani PRIVATE "include" "STMems_Standard_C_drivers/lsm9ds1_STdC/driver" "BMP280_driver")
 
 set_target_properties(guarani PROPERTIES
                           CXX_STANDARD 17
@@ -25,7 +25,7 @@ set_target_properties(guarani PROPERTIES
 
 #target_compile_features(guarani PRIVATE cxx_std_17)
 
-target_link_libraries(guarani PRIVATE Threads::Threads bmp3 lsm9ds1)
+target_link_libraries(guarani PRIVATE Threads::Threads bmp280 lsm9ds1)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
