@@ -1,12 +1,7 @@
 
-#include <config_ublox.h>
-#include <fstream>
 #include <gps.h>
 #include <i2c_aquisition.h>
-#include <lsm9ds1_reg.h>
 #include <recorder.h>
-#include <serial.h>
-#include <thread>
 
 int main(int ac, char **av) {
 
