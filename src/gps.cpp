@@ -38,11 +38,9 @@ void gps_t::run(std::atomic_bool &stop_flag) noexcept {
     _bytes_rcv = _serial.read(&_buffer[_buffer_pos], 250);
     if (_bytes_rcv > 0) {
       _buffer_pos += _bytes_rcv;
-      printf("GPS rcv: %d bytes | Total: %d bytes\n", _bytes_rcv, _buffer_pos);
       if (_buffer_pos >= sizeof(_buffer)) {
         if (create_packet(_pkt, _buffer, sizeof(_buffer))) {
           _packets.push(_pkt);
-          printf("GPS packet created: %d bytes\n", _buffer_pos);
         }
         _buffer_pos = 0;
       }

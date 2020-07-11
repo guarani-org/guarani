@@ -7,7 +7,7 @@ int main(int ac, char **av) {
 
   gni::packet_queue_t packets;
 
-  gni::recorder_t rec(packets, 1024 * 1024);
+  gni::recorder_t rec(packets, 1024 * 256);
   gni::gps_t gps("/dev/ttyS0", B9600, O_RDWR | O_NOCTTY, packets, "gps.hex");
   gni::i2c_aquisition_t i2c(packets, "/dev/i2c-1");
 
