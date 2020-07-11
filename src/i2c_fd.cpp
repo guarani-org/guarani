@@ -1,4 +1,4 @@
-#include <i2c.h>
+#include <i2c_fd.h>
 
 namespace gni {
 i2c_t &i2c_t::get(void) noexcept {

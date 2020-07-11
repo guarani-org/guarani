@@ -4,3 +4,6 @@
 [submodule "BMP280_driver"]
 	path = BMP280_driver
 	url = https://github.com/gui5/BMP280_driver.git
+[submodule "i2c-tools"]
+	path = i2c-tools
+	url = https://github.com/gui5/i2c-tools.git
