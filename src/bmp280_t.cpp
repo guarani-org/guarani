@@ -2,19 +2,25 @@
 #include <bmp280_t.h>
 #include <i2c/smbus.h>
 
-Bmp280::Bmp280(int fd, uint8_t i2cAddress) {
+bool Bmp280::initialize(int fd, uint8_t address) noexcept {
   fd_ = fd;
-  _i2cAddress = i2cAddress;
+  _i2cAddress = address;
+  bool resp = false;
 
-  ioctl(fd_, I2C_SLAVE, _i2cAddress);
-  i2c_smbus_write_byte_data(fd_, 0xF4, 0xB7);
-  i2c_smbus_write_byte_data(fd_, 0xF5, 0x10);
+  if (ioctl(fd_, I2C_SLAVE, _i2cAddress) >= 0) {
+    if (i2c_smbus_write_byte_data(fd_, 0xF4, 0xB7) >= 0 &&
+        i2c_smbus_write_byte_data(fd_, 0xF5, 0x10) >= 0) {
+      resp = true;
+    }
+  }
 
-  // i2c_smbus_write_byte_data(fd_, 0xF4, 0x27);
-  // i2c_smbus_write_byte_data(fd_, 0xF5, 0xA0);
+  return resp;
+}
+uint8_t Bmp280::get_address(void) noexcept {
+  return _i2cAddress;
 }
 
-void Bmp280::read() {
+void Bmp280::read() noexcept {
 
   ioctl(fd_, I2C_SLAVE, _i2cAddress);
 
@@ -25,8 +31,8 @@ void Bmp280::read() {
   i2c_smbus_read_i2c_block_data(fd_, 0xF7, sizeof(_raw_data.data),
                                 _raw_data.data);
 
-    //Do not process dataa to save cpu
-  
+  // Do not process dataa to save cpu
+
   // adcPres_ = ((static_cast<unsigned>(_raw_data.data[0]) << 16) +
   //             (static_cast<unsigned>(_raw_data.data[1]) << 8) +
   //             (_raw_data.data[2] & 0xF0)) >>

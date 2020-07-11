@@ -8,7 +8,7 @@
 namespace gni {
 static constexpr auto max_payload_sz = 1500;
 namespace pkt_type {
-enum { gps = 0, baro, mag, gyro, accel };
+enum { gps = 0, baro, imu };
 }
 
 #pragma pack(1)
