@@ -22,7 +22,8 @@ add_executable(guarani  src/main.cpp
                         src/recorder.cpp src/gps.cpp
                         src/i2c_fd.cpp
                         src/bmp280_t.cpp
-                        src/i2c_aquisition.cpp)
+                        src/i2c_aquisition.cpp
+                        src/lsm9ds1_t.cpp)
 
 target_include_directories(guarani PRIVATE  "include"
                                             "STMems_Standard_C_drivers/lsm9ds1_STdC/driver" 

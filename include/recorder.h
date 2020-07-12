@@ -3,6 +3,7 @@
 #include <queue>
 #include <string>
 #include <thread.h>
+#include <mutex>
 
 /*
   file name:
@@ -11,7 +12,7 @@
 namespace gni {
 class recorder_t : public thread_t {
 public:
-  recorder_t(packet_queue_t &packets, uint32_t max_file_size);
+  recorder_t(packet_queue_t &packets, uint32_t max_file_size, std::mutex &mtx);
   ~recorder_t(void) = default;
 
   bool initialize(void) noexcept;
@@ -26,7 +27,7 @@ private:
   uint32_t _file_segment_counter;
   std::string _base_file_name;
   uint32_t _file_size_counter;
-
+  std::mutex &_mtx;
   bool open_new_file(void) noexcept;
 };
 

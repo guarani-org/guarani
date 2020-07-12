@@ -8,8 +8,8 @@ public:
   thread_t(void) : _stop(false) {}
   virtual ~thread_t(void) = default;
 
-  void start(void) noexcept {
-    _thread = std::thread([this]{this->run(this->_stop);});
+  inline void start(void) noexcept {
+    _thread = std::thread([this] { this->run(this->_stop); });
   }
   void stop(void) noexcept { _stop = true; }
   void join(void) noexcept {

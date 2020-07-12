@@ -23,6 +23,7 @@ struct bmp280_calib_t {
 };
 
 struct bmp280_raw_data_t {
+  uint8_t validity;
   bmp280_calib_t calib_data;
   uint8_t data[8];
 };
@@ -47,4 +48,5 @@ protected:
   unsigned adcTemp_;
   unsigned adcPres_;
   uint8_t _i2cAddress;
+  uint8_t _status;
 };

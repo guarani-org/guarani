@@ -5,7 +5,7 @@
 #include <fcntl.h>
 
 namespace gni {
-struct i2c_devices {
+struct i2c_device {
   enum { BARO = 0x77, IMU = 0x6a, MAG = 0x1c };
 };
 

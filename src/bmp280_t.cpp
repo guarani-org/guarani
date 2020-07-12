@@ -16,20 +16,25 @@ bool Bmp280::initialize(int fd, uint8_t address) noexcept {
 
   return resp;
 }
-uint8_t Bmp280::get_address(void) noexcept {
-  return _i2cAddress;
-}
+uint8_t Bmp280::get_address(void) noexcept { return _i2cAddress; }
 
 void Bmp280::read() noexcept {
 
   ioctl(fd_, I2C_SLAVE, _i2cAddress);
 
-  i2c_smbus_read_i2c_block_data(
-      fd_, 0x88, sizeof(_raw_data.calib_data),
-      reinterpret_cast<uint8_t *>(&_raw_data.calib_data));
+  i2c_smbus_read_i2c_block_data(fd_, 0xF3, 1, &_status);
 
-  i2c_smbus_read_i2c_block_data(fd_, 0xF7, sizeof(_raw_data.data),
-                                _raw_data.data);
+  if ((_status & (1 << 3)) == 0) {
+    i2c_smbus_read_i2c_block_data(
+        fd_, 0x88, sizeof(_raw_data.calib_data),
+        reinterpret_cast<uint8_t *>(&_raw_data.calib_data));
+
+    i2c_smbus_read_i2c_block_data(fd_, 0xF7, sizeof(_raw_data.data),
+                                  _raw_data.data);
+    _raw_data.validity = 1;
+  }
+
+  _raw_data.validity = 0;
 
   // Do not process dataa to save cpu
 

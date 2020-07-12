@@ -1,4 +1,5 @@
 #pragma once
+#include <mutex>
 #include <packet.h>
 #include <serial.h>
 #include <thread.h>
@@ -7,14 +8,14 @@ namespace gni {
 class gps_t : public thread_t {
 public:
   gps_t(std::string_view serial_port, uint32_t baudrate, uint32_t mode,
-        packet_queue_t &packets,std::string_view gps_hex_file);
+        packet_queue_t &packets, std::string_view gps_hex_file,
+        std::mutex &mtx);
   ~gps_t(void) = default;
 
   bool set_baudrate(uint32_t baudrate) noexcept;
   bool initialize(void) noexcept;
 
 protected:
-
   void run(std::atomic_bool &stop_flag) noexcept override;
 
 private:
@@ -27,5 +28,6 @@ private:
   packet_t _pkt;
   std::string _gps_hex_file;
   uint32_t _baudrate;
+  std::mutex &_mtx;
 };
 } // namespace gni

@@ -4,16 +4,17 @@
 
 namespace gni {
 
-recorder_t::recorder_t(std::queue<packet_t> &packets, uint32_t max_file_size)
+recorder_t::recorder_t(std::queue<packet_t> &packets, uint32_t max_file_size,
+                       std::mutex & mtx)
     : _packets(packets), _file_segment_counter(0), _file_size_counter(0),
-      _max_file_size(max_file_size), _file(nullptr) {}
+      _max_file_size(max_file_size), _file(nullptr), _mtx(mtx) {}
 
 void recorder_t::run(std::atomic_bool &stop_flag) noexcept {
   stop_flag = false;
   while (!stop_flag) {
-    if (_packets.empty()) {
-      std::this_thread::yield();
-    } else {
+
+    if (!_packets.empty()) {
+      std::unique_lock<std::mutex> lock(_mtx);
       auto pkt = _packets.front();
       _packets.pop();
 
@@ -25,8 +26,8 @@ void recorder_t::run(std::atomic_bool &stop_flag) noexcept {
         _file_size_counter = 0;
         open_new_file();
       }
-      std::this_thread::yield();
     }
+    std::this_thread::yield();
   }
 }
 
