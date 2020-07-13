@@ -3,9 +3,10 @@
 using namespace gni;
 
 gps_t::gps_t(std::string_view serial_port, uint32_t baudrate, uint32_t mode,
-             packet_queue_t &packets, std::string_view gps_hex_file)
+             packet_queue_t &packets, std::string_view gps_hex_file,
+             std::mutex &mtx)
     : _serial(serial_port, B9600), _packets(packets), _baudrate(baudrate),
-      _serial_mode(mode), _gps_hex_file(gps_hex_file) {}
+      _serial_mode(mode), _gps_hex_file(gps_hex_file), _mtx(mtx) {}
 
 bool gps_t::set_baudrate(uint32_t baudrate) noexcept {
   _baudrate = _baudrate;
@@ -38,11 +39,10 @@ void gps_t::run(std::atomic_bool &stop_flag) noexcept {
     _bytes_rcv = _serial.read(&_buffer[_buffer_pos], 250);
     if (_bytes_rcv > 0) {
       _buffer_pos += _bytes_rcv;
-      printf("GPS rcv: %d bytes | Total: %d bytes\n", _bytes_rcv, _buffer_pos);
       if (_buffer_pos >= sizeof(_buffer)) {
         if (create_packet(_pkt, _buffer, sizeof(_buffer))) {
+          std::unique_lock<std::mutex> lock(_mtx);
           _packets.push(_pkt);
-          printf("GPS packet created: %d bytes\n", _buffer_pos);
         }
         _buffer_pos = 0;
       }

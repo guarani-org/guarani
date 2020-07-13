@@ -3,7 +3,7 @@ TARGETIP=192.168.0.28
 OLDPROGRAMPATH=/home/pi/guarani
 EXECUTABLE=build/guarani
 # make the target
-cd build && make -j4
+cd build && ninja
 cd ..
 # kill gdbserver on target
 ssh pi@$TARGETIP killall gdbserver

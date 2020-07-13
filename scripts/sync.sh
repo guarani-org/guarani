@@ -2,7 +2,7 @@ TARGETIP=192.168.0.28
 OLDPROGRAMPATH=/home/pi/guarani
 EXECUTABLE=build/guarani
 
-cd build && make -j4
+cd build && ninja
 cd ..
 
 echo copying to $TARGETIP
