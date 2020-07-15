@@ -1,22 +1,20 @@
 #pragma once
-#include <mutex>
-#include <packet.h>
+#include <packetbuffer.h>
 #include <serial.h>
 #include <thread.h>
 
 namespace gni {
 class gps_t : public thread_t {
 public:
-  gps_t(std::string_view serial_port, uint32_t baudrate, uint32_t mode,
-        packet_queue_t &packets, std::string_view gps_hex_file,
-        std::mutex &mtx);
+  gps_t(const char * serial_port, uint32_t baudrate, uint32_t mode,
+        packetbuffer_t &packets, const char * gps_hex_file);
   ~gps_t(void) = default;
 
   bool set_baudrate(uint32_t baudrate) noexcept;
   bool initialize(void) noexcept;
 
 protected:
-  void run(std::atomic_bool &stop_flag) noexcept override;
+  void run(void) noexcept override;
 
 private:
   serial_t _serial;
@@ -24,10 +22,9 @@ private:
   uint8_t _buffer[max_payload_sz];
   uint8_t _bytes_rcv;
   uint16_t _buffer_pos;
-  packet_queue_t &_packets;
+  packetbuffer_t &_packets;
   packet_t _pkt;
   std::string _gps_hex_file;
   uint32_t _baudrate;
-  std::mutex &_mtx;
 };
 } // namespace gni

@@ -13,6 +13,7 @@
 #include <unistd.h>
 
 namespace gni {
+static constexpr auto serial_char_rcv_count = 128;
 class serial_t {
 public:
   serial_t(void) = default;

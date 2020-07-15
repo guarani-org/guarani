@@ -37,11 +37,11 @@ std::vector<uint8_t> ublox_config::hex2byte(std::string_view hex) noexcept {
     bytes.push_back(byte);
   }
 
-  return std::move(bytes);
+  return bytes;
 }
 
 void ublox_config::compute_progress(uint32_t total_lines,
-                                     uint32_t actual_line) noexcept {
+                                    uint32_t actual_line) noexcept {
   if (total_lines > 0) {
     float progress = ((float)actual_line / (float)total_lines) * 100.0f;
     printf("Progress: %.2f\r", progress);
@@ -51,6 +51,11 @@ void ublox_config::compute_progress(uint32_t total_lines,
 
 bool ublox_config::configure(serial_t &serial,
                              std::string_view hex_file) noexcept {
+
+  if (fs::exists("/tmp/GPS_CONF_OK")) {
+    printf("GPS already configured\n");
+    return true;
+  }
 
   printf("Flashing GPS: %s\n", hex_file.data());
   if (!fs::exists(hex_file)) {
@@ -75,13 +80,15 @@ bool ublox_config::configure(serial_t &serial,
       serial.write(&byte, 1);
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    compute_progress(total_lines,++actual_line);
+    compute_progress(total_lines, ++actual_line);
   }
 
   serial.write((uint8_t *)baud_rate_cmd, sizeof(baud_rate_cmd));
   printf("GPS Baudrate set to 115200\n");
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   printf("Gps Flashing complete!\n");
+
+  system("touch /tmp/GPS_CONF_OK");
   return true;
 }
 

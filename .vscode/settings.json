@@ -51,7 +51,9 @@
         "functional": "cpp",
         "iomanip": "cpp",
         "sstream": "cpp",
-        "filesystem":"cpp"
+        "filesystem": "cpp",
+        "condition_variable": "cpp",
+        "mutex": "cpp"
     },
     "C_Cpp.intelliSenseEngineFallback": "Disabled"
 }

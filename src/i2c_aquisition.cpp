@@ -2,26 +2,25 @@
 #include <iostream>
 #include <lsm9ds1_t.h>
 namespace gni {
-i2c_aquisition_t::i2c_aquisition_t(packet_queue_t &pkt_queue,
-                                   const char *i2c_bus, std::mutex &mtx)
-    : _pkt_queue(pkt_queue), _i2c_bus(0), _bus_name(i2c_bus), _mtx(mtx) {}
+i2c_aquisition_t::i2c_aquisition_t(packetbuffer_t &pkt_queue,
+                                   const char *i2c_bus)
+    : _i2c_bus(0), _bus_name(i2c_bus), _pkt_queue(pkt_queue) {}
 
-void i2c_aquisition_t::run(std::atomic_bool &stop) noexcept {
-  while (!stop) {
+void i2c_aquisition_t::run(void) noexcept {
+  while (!_stop) {
 
     _bmp.read();
+    _imu.read();
+
     if (_bmp._raw_data.validity) {
       if (create_packet(_bmp_pkt, &_bmp._raw_data, sizeof(bmp280_raw_data_t))) {
-        std::unique_lock<std::mutex> lock(_mtx);
-        _pkt_queue.push(_bmp_pkt);
+        _pkt_queue.put(_bmp_pkt);
       }
     }
 
-    _imu.read();
     if (_imu.raw.validity > 0) {
       if (create_packet(_imu_pkt, &_imu.raw, sizeof(imu_raw_t))) {
-         std::unique_lock<std::mutex> lock(_mtx);
-        _pkt_queue.push(_imu_pkt);
+        _pkt_queue.put(_imu_pkt);
       }
     }
 

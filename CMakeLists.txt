@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(guarani VERSION 0.1.0)
 
-set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
-
 enable_testing()
 
-set(THREADS_PREFER_PTHREAD_FLAG ON)
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
+
 find_package(Threads REQUIRED)
 
 add_library(bmp280 STATIC BMP280_driver/bmp280.c)
@@ -38,7 +39,7 @@ set_target_properties(guarani PROPERTIES
 target_link_libraries(guarani PRIVATE   Threads::Threads 
                                         bmp280 
                                         lsm9ds1
-                                        i2ctools)
+                                        i2ctools )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

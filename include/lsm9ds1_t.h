@@ -1,16 +1,16 @@
 #pragma once
 
-#include <lsm9ds1_reg.h>
 #include <i2c/smbus.h>
 #include <i2c_fd.h>
 #include <linux/i2c-dev.h>
+#include <lsm9ds1_reg.h>
 #include <string.h>
 #include <sys/ioctl.h>
 #include <thread>
 
 namespace gni {
 
-  inline int32_t write_imu(void *handle, uint8_t reg, uint8_t *bufp,
+inline int32_t write_imu(void *handle, uint8_t reg, uint8_t *bufp,
                          uint16_t len) noexcept {
   int fd = *(int *)handle;
   ::ioctl(fd, I2C_SLAVE, gni::i2c_device::IMU);
@@ -52,11 +52,10 @@ inline void delay_mag_imu(uint32_t ms) noexcept {
   std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
 
-#pragma pack(1)
 union axis3bit16_t {
   int16_t i16bit[3];
   uint8_t u8bit[6];
-};
+} __attribute__((aligned(1), packed));
 
 struct imu_raw_t {
   uint8_t validity; // 0 = all invalid; 1 = accel & gyro valid; 2 = mag valid;
@@ -64,8 +63,7 @@ struct imu_raw_t {
   axis3bit16_t accel;
   axis3bit16_t gyro;
   axis3bit16_t mag;
-};
-#pragma pop()
+} __attribute__((aligned(1), packed));
 
 class lsm9ds1_t {
 public:

@@ -1,12 +1,13 @@
 #include <config_ublox.h>
 #include <gps.h>
+#include <serial.h>
 using namespace gni;
 
-gps_t::gps_t(std::string_view serial_port, uint32_t baudrate, uint32_t mode,
-             packet_queue_t &packets, std::string_view gps_hex_file,
-             std::mutex &mtx)
-    : _serial(serial_port, B9600), _packets(packets), _baudrate(baudrate),
-      _serial_mode(mode), _gps_hex_file(gps_hex_file), _mtx(mtx) {}
+gps_t::gps_t(const char *serial_port, uint32_t baudrate, uint32_t mode,
+             packetbuffer_t &packets, const char *gps_hex_file)
+    : _serial(serial_port, B9600), _serial_mode(mode), _bytes_rcv(0),
+      _buffer_pos(0), _packets(packets), _pkt({0}), _gps_hex_file(gps_hex_file),
+      _baudrate(baudrate) {}
 
 bool gps_t::set_baudrate(uint32_t baudrate) noexcept {
   _baudrate = _baudrate;
@@ -33,16 +34,16 @@ bool gps_t::initialize(void) noexcept {
   return true;
 }
 
-void gps_t::run(std::atomic_bool &stop_flag) noexcept {
+void gps_t::run(void) noexcept {
   _buffer_pos = 0;
-  while (!stop_flag) {
-    _bytes_rcv = _serial.read(&_buffer[_buffer_pos], 250);
+  while (!_stop) {
+
+    _bytes_rcv = _serial.read(&_buffer[_buffer_pos], serial_char_rcv_count);
     if (_bytes_rcv > 0) {
       _buffer_pos += _bytes_rcv;
-      if (_buffer_pos >= sizeof(_buffer)) {
+      if (_buffer_pos >= sizeof(_buffer) - 1) {
         if (create_packet(_pkt, _buffer, sizeof(_buffer))) {
-          std::unique_lock<std::mutex> lock(_mtx);
-          _packets.push(_pkt);
+          _packets.put(_pkt);
         }
         _buffer_pos = 0;
       }
