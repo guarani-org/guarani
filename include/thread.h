@@ -9,7 +9,7 @@ public:
   virtual ~thread_t(void) = default;
 
   inline void start(void) noexcept {
-    _thread = std::thread([this] { this->run(this->_stop); });
+    _thread = std::thread(&thread_t::run, this);
   }
   void stop(void) noexcept { _stop = true; }
   void join(void) noexcept {
@@ -19,10 +19,10 @@ public:
   }
 
 protected:
-  virtual void run(std::atomic_bool &stop_flag) noexcept = 0;
+  virtual void run(void) noexcept = 0;
+  std::atomic_bool _stop;
+  std::thread _thread;
 
 private:
-  std::thread _thread;
-  std::atomic_bool _stop;
 };
 } // namespace gni

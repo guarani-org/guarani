@@ -6,25 +6,23 @@
 #include <sys/time.h>
 
 namespace gni {
-static constexpr auto max_payload_sz = 1500;
+static constexpr auto max_payload_sz = 1024;
 namespace pkt_type {
 enum { gps = 0, baro, imu };
 }
 
-#pragma pack(1)
 struct header_t {
   uint64_t packet_sync = 4268435520;
   uint8_t type;
   uint64_t seconds;
   uint64_t nanos;
   uint32_t size;
-};
+}__attribute__((aligned(1),packed));
 
 struct packet_t {
   header_t header;
   uint8_t payload[max_payload_sz];
-};
-#pragma pop()
+}__attribute__((aligned(1),packed));
 
 static constexpr auto packet_header_size = sizeof(header_t);
 inline bool create_packet(packet_t &pkt, uint8_t type, void *payload,

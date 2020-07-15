@@ -4,8 +4,10 @@
 
 namespace gni {
 
+
+
 serial_t::serial_t(std::string_view device, int baud_rate)
-    : _device(device), _baud_rate(baud_rate), _fd(-1) {}
+    : _fd(-1), _device(device), _baud_rate(baud_rate) {}
 
 bool serial_t::open(int32_t mode) noexcept {
   _fd = ::open(_device.data(), mode);
@@ -31,7 +33,7 @@ bool serial_t::open(int32_t mode) noexcept {
   _newtio.c_lflag = 0;
 
   _newtio.c_cc[VTIME] = 0; /* inter-character timer TIME*.1 */
-  _newtio.c_cc[VMIN] = 250;
+  _newtio.c_cc[VMIN] = serial_char_rcv_count;
 
   if (::tcflush(_fd, TCIFLUSH) >= 0 &&
       ::tcsetattr(_fd, TCSANOW, &_newtio) >= 0) {

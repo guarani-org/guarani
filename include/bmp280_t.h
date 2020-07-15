@@ -6,7 +6,6 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#pragma pack(1)
 struct bmp280_calib_t {
   uint16_t t1;
   int16_t t2;
@@ -20,14 +19,13 @@ struct bmp280_calib_t {
   int16_t p7;
   int16_t p8;
   int16_t p9;
-};
+} __attribute__((aligned(1), packed));
 
 struct bmp280_raw_data_t {
   uint8_t validity;
   bmp280_calib_t calib_data;
   uint8_t data[8];
-};
-#pragma pop()
+} __attribute__((aligned(1), packed));
 
 class Bmp280 {
 
