@@ -1,10 +1,6 @@
 [
     {
         "name": "Raspberry-Pi-Zero GCC 10",
-        "toolchainFile": "/home/gui/Projects/sdk/cross-pi-gcc-10.1.0-0/toolchain/toolchain.cmake"
-    },
-    {
-        "name": "Raspberry-Pi-Zero GCC 8.3",
-        "toolchainFile": "/home/gui/Projects/sdk/cross-pi-gcc-8/cross-pi-gcc/toolchain.cmake"
+        "toolchainFile": "/mnt/d/projects/sdk/cross-pi-gcc-10.1.0-0/toolchain/toolchain.cmake"
     }
 ]
